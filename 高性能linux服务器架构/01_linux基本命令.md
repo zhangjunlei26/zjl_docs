@@ -1,5 +1,76 @@
 # linux 基本命令
 
+## 磁盘flush算法
+<code>
+cat /sys/block/sda/queue/scheduler  
+noop anticipatory deadline [cfq]  
+echo 'deadline'>/sys/block/sda/queue/scheduler  
+</code>
+
+
+
+## nf_conntrack/ip_conntrack
+
+nf_conntrack/ip_conntrack 跟 nat 有关，用来跟踪连接条目，它会使用一个哈希表来记录 established 的记录。nf_conntrack 在 2.6.15 被引入，而 ip_conntrack 在 2.6.22 被移除，如果该哈希表满了，就会出现：nf_conntrack: table full, dropping packet。  
+
+nf_conntrack 工作在 3 层，支持 IPv4 和 IPv6，而 ip_conntrack 只支持 IPv4。目前，大多的 ip_conntrack_* 已被 nf_conntrack_* 取代，很多 ip_conntrack_* 仅仅是个 alias，原先的 ip_conntrack 的 /proc/sys/net/ipv4/netfilter/ 依然存在，但是新的 nf_conntrack 在 /proc/sys/net/netfilter/ 中。  
+
+### 解决此问题有如下几种思路。
+
+#### 1.不使用 nf_conntrack 模块
+首先要移除 state 模块，因为使用该模块需要加载 nf_conntrack。确保 iptables 规则中没有出现类似 state 模块的规则，如果有的话将其移除：
+-A INPUT -m state –state RELATED,ESTABLISHED -j ACCEPT
+
+注释 /etc/sysconfig/iptables-config 中的：
+IPTABLES_MODULES="ip_conntrack_netbios_ns"
+
+移除 nf_conntrack 模块：
+$ sudo modprobe -r xt_NOTRACK nf_conntrack_netbios_ns nf_conntrack_ipv4 xt_state
+$ sudo modprobe -r nf_conntrack
+
+现在 /proc/net/ 下面应该没有 nf_conntrack 了。
+
+#### 2.调整 /proc/ 下面的参数
+可以增大 conntrack 的条目(sessions, connection tracking entries) CONNTRACK_MAX 或者增加存储 conntrack 条目哈希表的大小 HASHSIZE
+默认情况下，CONNTRACK_MAX 和 HASHSIZE 会根据系统内存大小计算出一个比较合理的值：
+对于 CONNTRACK_MAX，其计算公式：
+CONNTRACK_MAX = RAMSIZE (in bytes) / 16384 / (ARCH / 32)
+比如一个 64 位 48G 的机器可以同时处理 48*1024^3/16384/2 = 1572864 条 netfilter 连接。对于大于 1G 内存的系统，默认的 CONNTRACK_MAX 是 65535。
+
+对于 HASHSIZE，默认的有这样的转换关系：
+CONNTRACK_MAX = HASHSIZE * 8
+这表示每个链接列表里面平均有 8 个 conntrack 条目。其真正的计算公式如下：
+HASHSIZE = CONNTRACK_MAX / 8 = RAMSIZE (in bytes) / 131072 / (ARCH / 32)
+比如一个 64 位 48G 的机器可以存储 48*1024^3/131072/2 = 196608 的buckets(连接列表)。对于大于 1G 内存的系统，默认的 HASHSIZE 是 8192。
+
+可以通过 echo 直接修改目前系统 CONNTRACK_MAX 以及 HASHSIZE 的值：
+$ sudo su -c "echo 100000 > /proc/sys/net/netfilter/nf_conntrack_max"
+$ sudo su -c "echo 50000 > /proc/sys/net/netfilter/nf_conntrack_buckets"
+
+还可以缩短 timeout 的值：
+$ sudo su -c "echo 600 > /proc/sys/net/ipv4/netfilter/ip_conntrack_tcp_timeout_established"
+
+#### 3.使用 raw 表，不跟踪连接
+iptables 中的 raw 表跟包的跟踪有关，基本就是用来干一件事，通过 NOTRACK 给不需要被连接跟踪的包打标记，也就是说，如果一个连接遇到了 -j NOTRACK，conntrack 就不会跟踪该连接，raw 的优先级大于 mangle, nat, filter，包含 PREROUTING 和 OUTPUT 链。
+当执行 -t raw 时，系统会自动加载 iptable_raw 模块(需要该模块存在)。raw 在 2.4 以及 2.6 早期的内核中不存在，除非打了 patch，目前的系统应该都有支持:
+$ sudo iptables -A FORWARD -m state --state UNTRACKED -j ACCEPT
+$ sudo iptables -t raw -A PREROUTING -p tcp -m multiport --dport 80,81,82 -j NOTRACK
+$ sudo iptables -t raw -A PREROUTING -p tcp -m multiport --sport 80,81,82 -j NOTRACK
+
+上面三种方式，最有效的是 1 跟 3，第二种治标不治本。
+
+ref:  
+http://www.digipedia.pl/usenet/thread/16263/7806/  
+http://serverfault.com/questions/72366/how-do-i-disable-the-nf-conntrack-kernel-module-in-centos-5-3-without-recompilin  
+http://wiki.khnet.info/index.php/Conntrack_tuning  
+
+<code>
+grep nf_conntrack /proc/slabinfo  
+查出目前 nf_conntrack 的排名  
+cat /proc/net/nf_conntrack | cut -d ' ' -f 10 | cut -d '=' -f 2 | sort | uniq -c | sort -nr | head -n 10  
+
+</code>
+
 ## pkg-config 编译依赖
 当安装一个库时（从RPM，deb或其他二进制包管理系统），会包括一个后缀名为pc的文件，它会同其他.pc文件一起放入一个文件夹（依赖于你的系统设置）。
 
