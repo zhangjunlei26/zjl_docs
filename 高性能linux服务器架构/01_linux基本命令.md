@@ -1,4 +1,35 @@
 # linux 基本命令
+## ipcs 共享内存使用
+vm.nr_hugepages=5000
+vm.hugetlb_shm_group=27
+kernel.shmmax=1560281088 
+kernel.shmall=4194304
+
+
+见mysql：[开启大页支持](http://dev.mysql.com/doc/refman/5.0/en/large-page-support.html)
+
+	cat /proc/meminfo | grep -i huge
+	
+	[root@SSCJDH56 ~]# ipcs
+
+	------ Shared Memory Segments --------
+	key        shmid      owner      perms      bytes      nattch     status      
+	0x00000000 0          root       644        80         2                       
+	0x00000000 32769      root       644        16384      2                       
+	0x00000000 65538      root       644        280        2                       
+	0x00000000 98307      root       600        524288     23         dest         
+	0x00000000 360452     mysql      600        29360128   1          dest         
+	0x00000000 393221     mysql      600        8585740288 1          dest         
+
+	------ Semaphore Arrays --------
+	key        semid      owner      perms      nsems     
+	0x00000000 0          root       600        1         
+	0x00000000 32769      root       600        1         
+	0x000000a7 65538      root       600        1         
+
+	------ Message Queues --------
+	key        msqid      owner      perms      used-bytes   messages    
+
 
 ## 磁盘flush算法
 <code>
