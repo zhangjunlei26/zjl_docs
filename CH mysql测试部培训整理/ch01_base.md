@@ -1,8 +1,19 @@
 # CH MySQL 培训资料整理
 
-## 1 MySQL发展概述
+## 1. MySQL概述
 
-## 2 MySQL逻辑架构
+| First Header | Second Header | Third Header |
+| ------------ | ------------- | ------------ |
+| Content Cell | Content Cell  | Content Cell |
+| Content Cell | Content Cell  | Content Cell |
+
+
+
+### 1.1 MySQL发展概述
+
+### 1.2 MySQL逻辑架构
+
+
 ![image](http://files.jb51.net/file_images/article/201305/2013050211181116.png)
 ![image](http://images.cnblogs.com/cnblogs_com/hustcat/mysql/mysql01-1.JPG)
 
@@ -49,6 +60,74 @@ b. 行级锁：InnoDB和Falcon存储引擎提供行级锁，此外，BDB支持�
 
 
 
+
+
+## 2.列数据类型与操作符
+### 2.1 数值类型
+可用UNSIGNED/ZEROFILL修饰
+
+类型名	|	字节		|	有符号范围		|	无符号范围
+--------	| --------	|	--------	|	--------
+TINYINT 	|	1	|	-128~127		|	0~255
+SMALLINT	|	2	|	-32768~32767	|	0~65535
+MEDIUMINT	|	3	|	-8388608~8388607	| 0~16777215
+INTEGER		|	4   |	-2147483648~2147483647	| 0~4294967295
+BITINT		|	8	|	-9223372036854775808~9223372036854775807	| 0~18446744073709551615
+
+	
+	BOOL/BOOLEAN			1byte
+	BIT						1~64	
+	ENUM					
+	SET						8byte
+	FLOAT					4byte	
+	DOUBLE					8byte	
+	DECIMAL					(M,D)	
+	
+类型描述：
+
+	类型 [(M)][UNSIGNED] [ZEROFILL]
+	注：M指示最大显示宽度。最大有效显示宽度是255。显示宽度与存储大小或类型包含的值的范围无关。
+	
+	类型 [(M,D)] [UNSIGNED] [ZEROFILL]
+	M是总长度(不算小数点及符号)，D是小数点(标度)后面的位数。
+
+### 2.2日期时间类型
+|	类型			|	备注		|
+|	----------	|	-----	|
+|	DATE		|			
+|	DATETIME	|	
+|	TIMESTAMP	|	
+|	TIME		|	
+|	YEAR[(2\|4)]	|
+
+### 2.3 字符串类型
+|	类型			|	长度		|	定义语法	|
+|	----------	|	-----	|	-------	|
+|	CHAR		|	0~255	|	[NATIONAL] CHAR(M) [BINARY\| ASCII \| UNICODE]
+|	BINARY		|	0~255	|	BINARY(M)
+|	VARCHAR		|	0~65535	|	[NATIONAL] VARCHAR(M) [BINARY]
+|	VARBINARY	|	0~65535	|	VARBINARY(M)
+|	TINYBLOB	|	0~255	|	TINYBLOB
+|	TINYTEXT	|	0~255	|	TINYTEXT
+|	BLOG		|	0~65535	|	BLOG[(M)]
+|	TEXT		|	0~65535	|	TEXT[(M)]
+|	MEDIUMBLOB	|	0~16,777,215 (2<sup>24</sup>–1)		|	MEDIUMBLOB
+|	MEDIUMTEXT	|	0~16,777,215 (2<sup>24</sup>–1)	|	MEDIUMTEXT
+|	LONGBLOB	|	4,294,967,295或4GB(2<sup>32</sup>–1)	|	LONGBLOB
+|	LONGTEXT	|	4,294,967,295或4GB(2<sup>32</sup>–1)	|	LONGTEXT
+|	ENUM		|	65535个	|	ENUM('v1','v2',...)
+|	SET			|	64个		|	SET('v1','v2','v3')
+
+### 列存储需求
+
+### 选择正确的存储类型
+#### 数据超过范围和溢出
+* strict SQL mode:  失败并报错
+* no restrictive mode:	
+
+
+注意每个列的最大范围，避免数据溢出后得到意外结果。
+
 ## 3 MySQL常用语法
 
 ### 3.1 JOIN
@@ -82,6 +161,7 @@ b.多表空间存储：表的定义仍位于.frm文件，但是，每个InnoDB�
 innodb_file_per_table只影响表的创建。如果你用这个选项启动服务器，新表被用.ibd文件来创建，但是你仍旧能访问在共享表空间里的表。如果你删掉这个选项，新表在共享表空间内创建，但你仍旧可以访问任何用多表空间创建的表。
 InnoDB总是需要共享表空间，.ibd文件对InnoDB不足以去运行，共享表空间包含熟悉的ibdata文件，InnoDB把内部数据词典和undo日志放在这个文件中。
 
+
 #### 4.2.2 事务处理
 ##### 事务的ACID特性
 
@@ -91,9 +171,3 @@ InnoDB将MVCC机制与next-key lock结合起来，实现事务的各个隔离级
 
 ### 4.3 外键约束
 MySQL中，支持外键的存储引擎只有InnoDB，在创建外键时，要求被参照表必须有对应的索引，参照表在创建外键时也会自动创建对应的索引。
-
-## 5 MySQL性能指标
-
-## 6 Mysql性能分析
-
-## 7 MySQL参数配置
