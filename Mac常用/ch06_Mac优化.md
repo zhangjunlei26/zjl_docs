@@ -47,3 +47,11 @@ echo $0      #-sh su
 在/etc/ppp目录下新建一个文件options， 写入下面的内容  
 plugin L2TP.ppp l2tpnoipsec 
 就可以无需密钥连接了，最后别忘了把高级设置里面"通过VPN连接发送所有流量"钩上。  
+
+## 4. 设置网卡mac地址
+ifconfig en3 lladdr 00:10:13:0f:66:fe
+ifconfig en3 ether 00:10:13:0f:66:fe
+ioctl (set lladdr): network is down
+
+原始mac:
+00:10:13:ae:a5:94
