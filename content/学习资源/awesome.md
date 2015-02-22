@@ -1,4 +1,5 @@
-# Awesome
+Awesome
+============================
 
 > A curated list of awesome lists, forked from [sindresorhus/awesome](https://github.com/sindresorhus/awesome)
 

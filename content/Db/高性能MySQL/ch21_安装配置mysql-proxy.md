@@ -1,4 +1,6 @@
-### 安装mysql-proxy
+安装mysql-proxy
+============================
+
 > brew install glib
 > brew install lua
 >  ./configure --prefix=/opt/tools/dbtest/ --with-mysql=/opt/tools/percona5.6.12/bin/mysql_config --with-lua

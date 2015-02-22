@@ -1,4 +1,6 @@
-# linux 基本命令
+linux 基本命令
+============================
+
 ## ipcs 共享内存使用
 vm.nr_hugepages=5000
 vm.hugetlb_shm_group=27
