@@ -1,7 +1,6 @@
-#说明#
-该项目是我个人工作时经常内容的收集，为防止丢失，放在github上。主要包含以下内容：
+# zhangjunlei26.github.io
 
-* erlang编程指南读书笔记
-* 我的nginx配置脚本
-* linux内核优化参数
+[点击访问我的blog](http://zhangjunlei26.github.io)
+
+> *码农三分地，记录记录生活与学习的点滴*
 
