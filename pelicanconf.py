@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = u'zhangjunlei26@gmail.com'
 #SITENAME = u'\u4e00\u82b1\u4e00\u4e16\u754c'
 SITENAME = u'一叶一世界'
-SITEURL = 'http://zhangjunlei26.github.io/'
+SITEURL = '/'
 #https://disqus.com/home/
 #添加评论 disqus.com/zhangjunlei26/K#
 DISQUS_SITENAME = "zhangjunlei26"
@@ -32,9 +32,7 @@ PLUGINS = []
 
 
 #拷贝静态文件
-FILES_TO_COPY = (
-    ("extra/robots.txt", "robots.txt"),
-)
+
 #显示页码
 DISPLAY_PAGES_ON_MENU = True
 DISPLAY_CATEGORIES_ON_MENU = True
